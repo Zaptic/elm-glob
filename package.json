@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "test": "elm test"
+  },
   "dependencies": {
     "elm": "0.18.0",
     "elm-format": "0.7.0-exp",
