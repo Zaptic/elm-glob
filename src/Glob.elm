@@ -26,7 +26,7 @@ str : Options -> Parser GlobStructure
 str options =
     let
         chars char =
-            (char /= '?')
+            (not options.enableQuestionMark || char /= '?')
                 && (not options.enableAsterisk || char /= '*')
                 && (char /= '[')
     in
@@ -108,7 +108,7 @@ pattern options =
     let
         parsers =
             [ ( str options, True )
-            , ( anyChar, True )
+            , ( anyChar, options.enableQuestionMark )
             , ( anyString, options.enableAsterisk )
             , ( complementation, True )
             , ( characterClass, True )
@@ -223,6 +223,7 @@ toRegexString pattern =
 type alias Options =
     { caseInsensitive : Bool
     , enableAsterisk : Bool
+    , enableQuestionMark : Bool
     }
 
 
@@ -230,4 +231,5 @@ defaultOptions : Options
 defaultOptions =
     { caseInsensitive = False
     , enableAsterisk = True
+    , enableQuestionMark = True
     }

@@ -85,6 +85,15 @@ suite =
                 [ ( "a*c", "abc" )
                 , ( "a**", "aaabbbb" )
                 ]
+        , describe "matches with options: enableQuestionMark False" <|
+            testMatchesWithOptions { defaultOptions | enableQuestionMark = False }
+                [ ( "a*c", "a?c" )
+                ]
+        , describe "does not match with options: enableQuestionMark False" <|
+            testNoMatchesWithOptions { defaultOptions | enableQuestionMark = False }
+                [ ( "a?c", "abc" )
+                , ( "a??", "abb" )
+                ]
         ]
 
 
