@@ -1,7 +1,7 @@
 module Tests.Parse exposing (..)
 
 import Expect exposing (Expectation)
-import Glob exposing (..)
+import Glob.Core exposing (..)
 import Test exposing (..)
 
 
@@ -53,7 +53,7 @@ testSuccesses list =
         generateTest ( string, pattern ) =
             test string <|
                 \() ->
-                    Glob.parse string
+                    Glob.Core.parseWithOptions defaultOptions string
                         |> Expect.equal (Ok pattern)
     in
     List.map generateTest list

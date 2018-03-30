@@ -1,7 +1,9 @@
 module Tests.Match exposing (..)
 
 import Expect exposing (Expectation)
-import Glob exposing (..)
+import Glob
+import Glob.Core exposing (..)
+import Regex
 import Test exposing (..)
 
 
@@ -67,35 +69,42 @@ suite =
                 , ( "[a-z][A-Z]", "Aa" )
                 ]
         , describe "match with options: caseInsensitive False" <|
-            testMatchesWithOptions { defaultOptions | caseInsensitive = False }
+            testMatchesWithOptions defaultOptions
+                False
                 [ ( "a.+", "a.+" )
                 , ( "abc", "abc" )
                 ]
         , describe "match with options: caseInsensitive True" <|
-            testMatchesWithOptions { defaultOptions | caseInsensitive = True }
+            testMatchesWithOptions defaultOptions
+                True
                 [ ( "a.+", "A.+" )
                 , ( "abc", "AbC" )
                 ]
         , describe "matches with options: enableAsterisk False" <|
             testMatchesWithOptions { defaultOptions | enableAsterisk = False }
+                False
                 [ ( "a*c", "a*c" )
                 ]
         , describe "does not match with options: enableAsterisk False" <|
             testNoMatchesWithOptions { defaultOptions | enableAsterisk = False }
+                False
                 [ ( "a*c", "abc" )
                 , ( "a**", "aaabbbb" )
                 ]
         , describe "matches with options: enableQuestionMark False" <|
             testMatchesWithOptions { defaultOptions | enableQuestionMark = False }
+                False
                 [ ( "a*c", "a?c" )
                 ]
         , describe "does not match with options: enableQuestionMark False" <|
             testNoMatchesWithOptions { defaultOptions | enableQuestionMark = False }
+                False
                 [ ( "a?c", "abc" )
                 , ( "a??", "abb" )
                 ]
         , describe "matches with options: enableBrackets False" <|
             testMatchesWithOptions { defaultOptions | enableBrackets = False }
+                False
                 [ ( "a[c]", "a[c]" )
                 , ( "a[c", "a[c" )
                 , ( "a]c", "a]c" )
@@ -103,6 +112,7 @@ suite =
                 ]
         , describe "does not match with options: enableBrackets False" <|
             testNoMatchesWithOptions { defaultOptions | enableBrackets = False }
+                False
                 [ ( "a[c]", "ac" )
                 , ( "a[*]", "ac" )
                 ]
@@ -111,33 +121,51 @@ suite =
 
 testMatches : List ( String, String ) -> List Test
 testMatches list =
-    testMatchesWithOptions defaultOptions list
+    testMatchesWithOptions defaultOptions False list
 
 
-testMatchesWithOptions : Options -> List ( String, String ) -> List Test
-testMatchesWithOptions options list =
+testMatchesWithOptions : Glob.Core.Options -> Bool -> List ( String, String ) -> List Test
+testMatchesWithOptions options caseInsensitive list =
     let
         generateTest ( pattern, string ) =
             test (pattern ++ " matches " ++ string) <|
                 \() ->
-                    Glob.matchWithOptions options pattern string
-                        |> Expect.true ("Failed to match with regex: " ++ (toString <| Glob.toRegexString pattern))
+                    matchWithOptions options caseInsensitive pattern string
+                        |> Expect.true ("Failed to match with regex: " ++ (toString <| Glob.toRegexString options pattern))
     in
     List.map generateTest list
 
 
 testNoMatches : List ( String, String ) -> List Test
 testNoMatches list =
-    testNoMatchesWithOptions defaultOptions list
+    testNoMatchesWithOptions defaultOptions False list
 
 
-testNoMatchesWithOptions : Options -> List ( String, String ) -> List Test
-testNoMatchesWithOptions options list =
+testNoMatchesWithOptions : Options -> Bool -> List ( String, String ) -> List Test
+testNoMatchesWithOptions options caseInsensitive list =
     let
         generateTest ( pattern, string ) =
             test (pattern ++ " matches " ++ string) <|
                 \() ->
-                    Glob.matchWithOptions options pattern string
-                        |> Expect.false ("Matched incorrectly with regex: " ++ (toString <| Glob.toRegexString pattern))
+                    matchWithOptions options caseInsensitive pattern string
+                        |> Expect.false ("Matched incorrectly with regex: " ++ (toString <| Glob.toRegexString options pattern))
     in
     List.map generateTest list
+
+
+matchWithOptions : Options -> Bool -> String -> String -> Bool
+matchWithOptions options caseInsensitive pattern string =
+    parseWithOptions options pattern
+        |> Result.map
+            (\structure ->
+                renderRegexString structure
+                    |> Regex.regex
+                    |> (\regex ->
+                            if caseInsensitive then
+                                Regex.caseInsensitive regex
+                            else
+                                regex
+                       )
+            )
+        |> Result.map (\regex -> Regex.contains regex string)
+        |> Result.withDefault False

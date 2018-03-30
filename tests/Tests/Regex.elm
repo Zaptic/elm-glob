@@ -1,7 +1,7 @@
 module Tests.Regex exposing (..)
 
 import Expect exposing (Expectation)
-import Glob exposing (..)
+import Glob.Core exposing (..)
 import Test exposing (..)
 
 
@@ -40,7 +40,7 @@ testSuccesses list =
         generateTest ( pattern, string ) =
             test string <|
                 \() ->
-                    Glob.renderRegexString pattern
+                    Glob.Core.renderRegexString pattern
                         |> Expect.equal string
     in
     List.map generateTest list
