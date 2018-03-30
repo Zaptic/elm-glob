@@ -15,14 +15,6 @@ suite =
                 , ( "a??c", "apqc" )
                 , ( "?a?c?", "lamcn" )
                 ]
-        , describe "does not match ?" <|
-            testNoMatches
-                [ ( "a?b", "acbd" )
-                , ( "a?b.", "acbd" )
-                , ( "a?b?c", "abzyc" )
-                , ( "a??c", "apqdc" )
-                , ( "?a?c?", "dlamcn" )
-                ]
         , describe "matches *" <|
             testMatches
                 [ ( "a*b", "aaaaaaaaabbbbbbbbbbb" )
@@ -31,11 +23,6 @@ suite =
                 , ( "*a*c*", "ac" )
                 , ( "*a*c*", "bbbbbbac" )
                 , ( "*a*c*", "acdddd" )
-                ]
-        , describe "does not match *" <|
-            testNoMatches
-                [ ( "a*b", "aaaaaaaaabc" )
-                , ( "a*b", "aaaaaaaaac" )
                 ]
         , describe "matches []" <|
             testMatches
@@ -61,6 +48,23 @@ suite =
                 , ( "[A-Z]", "F" )
                 , ( "[0-9]", "3" )
                 , ( "[A-Z0-9]", "Q" )
+                , ( "[a-z][A-Z]", "aA" )
+                ]
+        , describe "does match" <|
+            testMatches
+                [ ( "a.+", "a.+" )
+                , ( "abc", "abc" )
+                ]
+        , describe "does not match" <|
+            testNoMatches
+                [ ( "a*b", "aaaaaaaaabc" )
+                , ( "a?b", "acbd" )
+                , ( "a?b.", "acbd" )
+                , ( "a.+", "ab" )
+                , ( "a??c", "apqdc" )
+                , ( "?a?c?", "dlamcn" )
+                , ( "[A-Y]", "Z" )
+                , ( "[a-z][A-Z]", "Aa" )
                 ]
         ]
 
