@@ -125,10 +125,12 @@ renderRegexString : GlobStructure -> String
 renderRegexString structure =
     case structure of
         Pattern list ->
-            String.concat <| List.map renderRegexString list
+            List.map renderRegexString list
+                |> String.concat
+                |> (\string -> "^" ++ string ++ "$")
 
         Str string ->
-            string
+            Regex.escape string
 
         AnyChar ->
             "."

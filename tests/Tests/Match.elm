@@ -9,14 +9,22 @@ suite : Test
 suite =
     describe "Match"
         [ describe "matches ?" <|
-            testSuccesses
+            testMatches
                 [ ( "a?b", "acb" )
                 , ( "a?b?c", "azbyc" )
                 , ( "a??c", "apqc" )
                 , ( "?a?c?", "lamcn" )
                 ]
+        , describe "does not match ?" <|
+            testNoMatches
+                [ ( "a?b", "acbd" )
+                , ( "a?b.", "acbd" )
+                , ( "a?b?c", "abzyc" )
+                , ( "a??c", "apqdc" )
+                , ( "?a?c?", "dlamcn" )
+                ]
         , describe "matches *" <|
-            testSuccesses
+            testMatches
                 [ ( "a*b", "aaaaaaaaabbbbbbbbbbb" )
                 , ( "a*b*c", "aaafffbbbbbbbcccccc" )
                 , ( "a**c", "abdefghig2341239+$£%c" )
@@ -24,8 +32,13 @@ suite =
                 , ( "*a*c*", "bbbbbbac" )
                 , ( "*a*c*", "acdddd" )
                 ]
+        , describe "does not match *" <|
+            testNoMatches
+                [ ( "a*b", "aaaaaaaaabc" )
+                , ( "a*b", "aaaaaaaaac" )
+                ]
         , describe "matches []" <|
-            testSuccesses
+            testMatches
                 [ ( "[ab]", "a" )
                 , ( "[]]", "]" )
                 , ( "[]a]", "]" )
@@ -35,14 +48,14 @@ suite =
                 , ( "[*]", "*" )
                 ]
         , describe "matches [!]" <|
-            testSuccesses
+            testMatches
                 [ ( "[!ab]", "f" )
                 , ( "[!]]", "[" )
                 , ( "[!]a]", "b" )
                 , ( "b[!]a]c", "bdc" )
                 ]
         , describe "matches [a-b]" <|
-            testSuccesses
+            testMatches
                 [ ( "[a-c]", "b" )
                 , ( "[a-bc]", "c" )
                 , ( "[A-Z]", "F" )
@@ -52,13 +65,25 @@ suite =
         ]
 
 
-testSuccesses : List ( String, String ) -> List Test
-testSuccesses list =
+testMatches : List ( String, String ) -> List Test
+testMatches list =
     let
         generateTest ( pattern, string ) =
             test (pattern ++ " matches " ++ string) <|
                 \() ->
                     Glob.match pattern string
-                        |> Expect.true ("Failed with regex: " ++ (toString <| Glob.toRegexString pattern))
+                        |> Expect.true ("Failed to match with regex: " ++ (toString <| Glob.toRegexString pattern))
+    in
+    List.map generateTest list
+
+
+testNoMatches : List ( String, String ) -> List Test
+testNoMatches list =
+    let
+        generateTest ( pattern, string ) =
+            test (pattern ++ " matches " ++ string) <|
+                \() ->
+                    Glob.match pattern string
+                        |> Expect.false ("Matched incorrectly with regex: " ++ (toString <| Glob.toRegexString pattern))
     in
     List.map generateTest list

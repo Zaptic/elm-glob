@@ -10,26 +10,26 @@ suite =
     describe "Regex"
         [ describe "renders ?" <|
             testSuccesses
-                [ Pattern [ Str "a", AnyChar, Str "b" ] => "a.b"
-                , Pattern [ Str "a", AnyChar, Str "b", AnyChar, Str "c" ] => "a.b.c"
-                , Pattern [ Str "a", AnyChar, AnyChar, Str "c" ] => "a..c"
-                , Pattern [ AnyChar, Str "a", AnyChar, Str "c", AnyChar ] => ".a.c."
+                [ Pattern [ Str "a", AnyChar, Str "b" ] => "^a.b$"
+                , Pattern [ Str "a", AnyChar, Str "b", AnyChar, Str "c" ] => "^a.b.c$"
+                , Pattern [ Str "a", AnyChar, AnyChar, Str "c" ] => "^a..c$"
+                , Pattern [ AnyChar, Str "a", AnyChar, Str "c", AnyChar ] => "^.a.c.$"
                 ]
         , describe "renders *" <|
             testSuccesses
-                [ Pattern [ Str "a", AnyString, Str "b" ] => "a.*b"
-                , Pattern [ Str "a", AnyString, Str "b", AnyString, Str "c" ] => "a.*b.*c"
-                , Pattern [ Str "a", AnyString, AnyString, Str "c" ] => "a.*.*c"
-                , Pattern [ AnyString, Str "a", AnyString, Str "c", AnyString ] => ".*a.*c.*"
+                [ Pattern [ Str "a", AnyString, Str "b" ] => "^a.*b$"
+                , Pattern [ Str "a", AnyString, Str "b", AnyString, Str "c" ] => "^a.*b.*c$"
+                , Pattern [ Str "a", AnyString, AnyString, Str "c" ] => "^a.*.*c$"
+                , Pattern [ AnyString, Str "a", AnyString, Str "c", AnyString ] => "^.*a.*c.*$"
                 ]
         , describe "renders []" <|
             testSuccesses
-                [ Pattern [ CharacterClass [ Ch "a", Ch "b" ] ] => "[ab]"
-                , Pattern [ CharacterClass [ Ch "]" ] ] => "[\\]]"
-                , Pattern [ CharacterClass [ Ch "]", Ch "a" ] ] => "[\\]a]"
-                , Pattern [ CharacterClass [ Ch "!" ] ] => "[!]"
-                , Pattern [ CharacterClass [ Ch "?" ] ] => "[\\?]"
-                , Pattern [ CharacterClass [ Ch "*" ] ] => "[\\*]"
+                [ Pattern [ CharacterClass [ Ch "a", Ch "b" ] ] => "^[ab]$"
+                , Pattern [ CharacterClass [ Ch "]" ] ] => "^[\\]]$"
+                , Pattern [ CharacterClass [ Ch "]", Ch "a" ] ] => "^[\\]a]$"
+                , Pattern [ CharacterClass [ Ch "!" ] ] => "^[!]$"
+                , Pattern [ CharacterClass [ Ch "?" ] ] => "^[\\?]$"
+                , Pattern [ CharacterClass [ Ch "*" ] ] => "^[\\*]$"
                 ]
         ]
 
