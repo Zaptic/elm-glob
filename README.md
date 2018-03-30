@@ -6,6 +6,8 @@ matched using the core [Regex](http://package.elm-lang.org/packages/elm-lang/cor
 
 ## Features
 
+### Syntax
+
 | Syntax | Description |
 | ------ | ----------- |
 | *      | matches everything |
@@ -15,6 +17,14 @@ matched using the core [Regex](http://package.elm-lang.org/packages/elm-lang/cor
 
 The set syntax also supports ranges. eg. `a-z`, `0-6`, etc. Only ASCII letters & numbers as I'm
 unclear on how to properly support other locales.
+
+
+### Options
+
+Available using the `matchWithOptions` function and the `defaultOptions` record.
+
+- **caseInsenstive** (default: False)
+  Sets 'caseInsenstive' on the underlying Regex.
 
 
 ## Status

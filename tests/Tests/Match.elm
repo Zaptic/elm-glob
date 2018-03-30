@@ -66,16 +66,31 @@ suite =
                 , ( "[A-Y]", "Z" )
                 , ( "[a-z][A-Z]", "Aa" )
                 ]
+        , describe "match with options: caseInsensitive False" <|
+            testMatchesWithOptions { defaultOptions | caseInsensitive = False }
+                [ ( "a.+", "a.+" )
+                , ( "abc", "abc" )
+                ]
+        , describe "match with options: caseInsensitive True" <|
+            testMatchesWithOptions { defaultOptions | caseInsensitive = True }
+                [ ( "a.+", "A.+" )
+                , ( "abc", "AbC" )
+                ]
         ]
 
 
 testMatches : List ( String, String ) -> List Test
 testMatches list =
+    testMatchesWithOptions defaultOptions list
+
+
+testMatchesWithOptions : Options -> List ( String, String ) -> List Test
+testMatchesWithOptions options list =
     let
         generateTest ( pattern, string ) =
             test (pattern ++ " matches " ++ string) <|
                 \() ->
-                    Glob.match pattern string
+                    Glob.matchWithOptions options pattern string
                         |> Expect.true ("Failed to match with regex: " ++ (toString <| Glob.toRegexString pattern))
     in
     List.map generateTest list

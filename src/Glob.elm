@@ -18,6 +18,10 @@ type ClassMember
     | Range String String
 
 
+
+-- Parsing
+
+
 str : Parser GlobStructure
 str =
     let
@@ -167,9 +171,23 @@ renderRegexClassMembers member =
 
 match : String -> String -> Bool
 match pattern string =
+    matchWithOptions defaultOptions pattern string
+
+
+matchWithOptions : Options -> String -> String -> Bool
+matchWithOptions options pattern string =
     parse pattern
-        |> Result.map renderRegexString
-        |> Result.map Regex.regex
+        |> Result.map
+            (\structure ->
+                renderRegexString structure
+                    |> Regex.regex
+                    |> (\regex ->
+                            if options.caseInsensitive then
+                                Regex.caseInsensitive regex
+                            else
+                                regex
+                       )
+            )
         |> Result.map (\regex -> Regex.contains regex string)
         |> Result.withDefault False
 
@@ -182,3 +200,18 @@ toRegexString : String -> Result Error String
 toRegexString pattern =
     parse pattern
         |> Result.map renderRegexString
+
+
+
+-- Options
+
+
+type alias Options =
+    { caseInsensitive : Bool
+    }
+
+
+defaultOptions : Options
+defaultOptions =
+    { caseInsensitive = False
+    }
