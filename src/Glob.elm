@@ -22,11 +22,13 @@ type ClassMember
 -- Parsing
 
 
-str : Parser GlobStructure
-str =
+str : Options -> Parser GlobStructure
+str options =
     let
         chars char =
-            char /= '?' && char /= '*' && char /= '['
+            (char /= '?')
+                && (not options.enableAsterisk || char /= '*')
+                && (char /= '[')
     in
     succeed Str
         |= keep oneOrMore chars
@@ -101,24 +103,36 @@ complementation =
         (symbol "]")
 
 
-pattern : Parser GlobStructure
-pattern =
+pattern : Options -> Parser GlobStructure
+pattern options =
+    let
+        parsers =
+            [ ( str options, True )
+            , ( anyChar, True )
+            , ( anyString, options.enableAsterisk )
+            , ( complementation, True )
+            , ( characterClass, True )
+            ]
+
+        enabledParsers =
+            parsers
+                |> List.filter Tuple.second
+                |> List.map Tuple.first
+    in
     inContext "pattern" <|
         map Pattern <|
             repeat oneOrMore
-                (oneOf
-                    [ str
-                    , anyChar
-                    , anyString
-                    , complementation
-                    , characterClass
-                    ]
-                )
+                (oneOf enabledParsers)
 
 
 parse : String -> Result Parser.Error GlobStructure
 parse string =
-    Parser.run pattern string
+    parseWithOptions defaultOptions string
+
+
+parseWithOptions : Options -> String -> Result Parser.Error GlobStructure
+parseWithOptions options string =
+    Parser.run (pattern options) string
 
 
 
@@ -176,7 +190,7 @@ match pattern string =
 
 matchWithOptions : Options -> String -> String -> Bool
 matchWithOptions options pattern string =
-    parse pattern
+    parseWithOptions options pattern
         |> Result.map
             (\structure ->
                 renderRegexString structure
@@ -208,10 +222,12 @@ toRegexString pattern =
 
 type alias Options =
     { caseInsensitive : Bool
+    , enableAsterisk : Bool
     }
 
 
 defaultOptions : Options
 defaultOptions =
     { caseInsensitive = False
+    , enableAsterisk = True
     }

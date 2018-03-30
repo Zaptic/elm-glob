@@ -76,6 +76,15 @@ suite =
                 [ ( "a.+", "A.+" )
                 , ( "abc", "AbC" )
                 ]
+        , describe "matches with options: enableAsterisk False" <|
+            testMatchesWithOptions { defaultOptions | enableAsterisk = False }
+                [ ( "a*c", "a*c" )
+                ]
+        , describe "does not match with options: enableAsterisk False" <|
+            testNoMatchesWithOptions { defaultOptions | enableAsterisk = False }
+                [ ( "a*c", "abc" )
+                , ( "a**", "aaabbbb" )
+                ]
         ]
 
 
@@ -98,11 +107,16 @@ testMatchesWithOptions options list =
 
 testNoMatches : List ( String, String ) -> List Test
 testNoMatches list =
+    testNoMatchesWithOptions defaultOptions list
+
+
+testNoMatchesWithOptions : Options -> List ( String, String ) -> List Test
+testNoMatchesWithOptions options list =
     let
         generateTest ( pattern, string ) =
             test (pattern ++ " matches " ++ string) <|
                 \() ->
-                    Glob.match pattern string
+                    Glob.matchWithOptions options pattern string
                         |> Expect.false ("Matched incorrectly with regex: " ++ (toString <| Glob.toRegexString pattern))
     in
     List.map generateTest list

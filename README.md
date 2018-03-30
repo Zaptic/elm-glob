@@ -25,6 +25,8 @@ Available using the `matchWithOptions` function and the `defaultOptions` record.
 
 - **caseInsenstive** (default: False)
   Sets 'caseInsenstive' on the underlying Regex.
+- **enableAsterisk** (default: True)
+  Can be used to disable the handling of '\*'
 
 
 ## Status
