@@ -94,6 +94,18 @@ suite =
                 [ ( "a?c", "abc" )
                 , ( "a??", "abb" )
                 ]
+        , describe "matches with options: enableBrackets False" <|
+            testMatchesWithOptions { defaultOptions | enableBrackets = False }
+                [ ( "a[c]", "a[c]" )
+                , ( "a[c", "a[c" )
+                , ( "a]c", "a]c" )
+                , ( "a[*]", "a[something]" )
+                ]
+        , describe "does not match with options: enableBrackets False" <|
+            testNoMatchesWithOptions { defaultOptions | enableBrackets = False }
+                [ ( "a[c]", "ac" )
+                , ( "a[*]", "ac" )
+                ]
         ]
 
 

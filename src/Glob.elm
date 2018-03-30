@@ -28,7 +28,7 @@ str options =
         chars char =
             (not options.enableQuestionMark || char /= '?')
                 && (not options.enableAsterisk || char /= '*')
-                && (char /= '[')
+                && (not options.enableBrackets || char /= '[')
     in
     succeed Str
         |= keep oneOrMore chars
@@ -110,8 +110,8 @@ pattern options =
             [ ( str options, True )
             , ( anyChar, options.enableQuestionMark )
             , ( anyString, options.enableAsterisk )
-            , ( complementation, True )
-            , ( characterClass, True )
+            , ( complementation, options.enableBrackets )
+            , ( characterClass, options.enableBrackets )
             ]
 
         enabledParsers =
@@ -224,6 +224,7 @@ type alias Options =
     { caseInsensitive : Bool
     , enableAsterisk : Bool
     , enableQuestionMark : Bool
+    , enableBrackets : Bool
     }
 
 
@@ -232,4 +233,5 @@ defaultOptions =
     { caseInsensitive = False
     , enableAsterisk = True
     , enableQuestionMark = True
+    , enableBrackets = True
     }
