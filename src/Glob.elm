@@ -1,20 +1,7 @@
 module Glob exposing (..)
 
 import Parser exposing (..)
-
-
-type Glob
-    = Glob String
-
-
-glob : String -> Glob
-glob string =
-    Glob string
-
-
-match : Glob -> String -> Bool
-match glob string =
-    False
+import Regex
 
 
 type GlobStructure
@@ -128,3 +115,68 @@ pattern =
 parse : String -> Result Parser.Error GlobStructure
 parse string =
     Parser.run pattern string
+
+
+
+-- Rendering
+
+
+renderRegexString : GlobStructure -> String
+renderRegexString structure =
+    case structure of
+        Pattern list ->
+            String.concat <| List.map renderRegexString list
+
+        Str string ->
+            string
+
+        AnyChar ->
+            "."
+
+        AnyString ->
+            ".*"
+
+        CharacterClass list ->
+            list
+                |> List.map renderRegexClassMembers
+                |> String.concat
+                |> (\string -> "[" ++ string ++ "]")
+
+        Complementation list ->
+            list
+                |> List.map renderRegexClassMembers
+                |> String.concat
+                |> (\string -> "[^" ++ string ++ "]")
+
+
+renderRegexClassMembers : ClassMember -> String
+renderRegexClassMembers member =
+    case member of
+        Ch char ->
+            Regex.escape char
+
+        Range from to ->
+            from ++ "-" ++ to
+
+
+
+-- Matching
+
+
+match : String -> String -> Bool
+match pattern string =
+    parse pattern
+        |> Result.map renderRegexString
+        |> Result.map Regex.regex
+        |> Result.map (\regex -> Regex.contains regex string)
+        |> Result.withDefault False
+
+
+
+-- Convert
+
+
+toRegexString : String -> Result Error String
+toRegexString pattern =
+    parse pattern
+        |> Result.map renderRegexString

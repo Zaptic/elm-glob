@@ -1,4 +1,4 @@
-module Tests.Glob exposing (..)
+module Tests.Parse exposing (..)
 
 import Expect exposing (Expectation)
 import Glob exposing (..)
@@ -7,7 +7,7 @@ import Test exposing (..)
 
 suite : Test
 suite =
-    describe "Glob"
+    describe "Parse"
         [ describe "parses ?" <|
             testSuccesses
                 [ "a?b" => Pattern [ Str "a", AnyChar, Str "b" ]
