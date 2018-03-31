@@ -1,8 +1,8 @@
-module Glob exposing (Error, Glob, Options, caseInsensitive, defaultOptions, glob, globWithOptions, toRegexString)
+module Glob exposing (Error, Glob, Options, caseInsensitive, defaultOptions, glob, globWithOptions, match, toRegexString)
 
 {-|
 
-@docs Glob, Error, glob, globWithOptions, caseInsensitive, Options, defaultOptions, toRegexString
+@docs Glob, Error, glob, globWithOptions, caseInsensitive, Options, defaultOptions, match, toRegexString
 
 -}
 
@@ -40,6 +40,20 @@ caseInsensitive : Glob -> Glob
 caseInsensitive (Glob regex) =
     Regex.caseInsensitive regex
         |> Glob
+
+
+
+-- Match
+
+
+{-| -}
+match : Glob -> String -> Bool
+match (Glob regex) string =
+    Regex.contains regex string
+
+
+
+-- Convert
 
 
 {-| -}

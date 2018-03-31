@@ -3,7 +3,6 @@ module Tests.Match exposing (..)
 import Expect exposing (Expectation)
 import Glob
 import Glob.Core exposing (..)
-import Regex
 import Test exposing (..)
 
 
@@ -155,17 +154,13 @@ testNoMatchesWithOptions options caseInsensitive list =
 
 matchWithOptions : Options -> Bool -> String -> String -> Bool
 matchWithOptions options caseInsensitive pattern string =
-    parseWithOptions options pattern
+    Glob.globWithOptions options pattern
         |> Result.map
-            (\structure ->
-                renderRegexString structure
-                    |> Regex.regex
-                    |> (\regex ->
-                            if caseInsensitive then
-                                Regex.caseInsensitive regex
-                            else
-                                regex
-                       )
+            (\glob ->
+                if caseInsensitive then
+                    Glob.caseInsensitive glob
+                else
+                    glob
             )
-        |> Result.map (\regex -> Regex.contains regex string)
+        |> Result.map (flip Glob.match string)
         |> Result.withDefault False
