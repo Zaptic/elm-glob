@@ -1,7 +1,7 @@
 {
-    "version": "4.0.0",
-    "summary": "Example Project",
-    "repository": "https://github.com/user/project.git",
+    "version": "1.0.0",
+    "summary": "Glob/Fn-match style string matching",
+    "repository": "https://github.com/Zaptic/elm-glob.git",
     "license": "BSD-3-Clause",
     "source-directories": [
         "src"
