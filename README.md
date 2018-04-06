@@ -8,12 +8,10 @@ matched using the core [Regex](http://package.elm-lang.org/packages/elm-lang/cor
 
 ### Syntax
 
-| Syntax | Description |
-| ------ | ----------- |
-| *      | matches everything |
-| ?      | matches any single character |
-| [set]  | matches any character in the set |
-| [!set] | matches any character not in the set |
+- **&ast;** - matches everything
+- **?** - matches any single character
+- **[set]** - matches any character in the set
+- **[!set]** - matches any character not in the set
 
 The set syntax also supports ranges. eg. `a-z`, `0-6`, etc. Only ASCII letters & numbers as I'm
 unclear on how to properly support other locales.
@@ -21,10 +19,7 @@ unclear on how to properly support other locales.
 
 ### Options
 
-Available using the `matchWithOptions` function and the `defaultOptions` record.
-
-- **caseInsenstive** (default: False)
-  Sets 'caseInsenstive' on the underlying Regex.
+Available with the `defaultOptions` record which has the `Options` type.
 
 - **enableAsterisk** (default: True)
   Can be used to disable the handling of '\*'
@@ -36,9 +31,10 @@ Available using the `matchWithOptions` function and the `defaultOptions` record.
   Can be used to disable the handling of characters sets that use '[]'
 
 
-## Status
+Available as an independent function:
 
-In progress.
+- **Glob.caseInsenstive**
+  Sets 'caseInsenstive' on the underlying Regex.
 
 
 ## Contribute
